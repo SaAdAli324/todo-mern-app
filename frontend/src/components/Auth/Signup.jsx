@@ -47,7 +47,7 @@ const Signup = () => {
   return (
     <div className='flex justify-center items-center flex-col'>
              <div className='flex justify-center'>
-            <div className='flex max-sm:w-80 max-sm:h-fit  md: w-162 h-190  rounded-2xl  flex-col gap-8 bg-indigo-600 mt-20'>
+            <div className='flex max-sm:w-80 max-sm:h-fit  md: w-162 h-140  rounded-2xl  flex-col gap-8 bg-indigo-600 mt-20'>
                 <form onSubmit={handleSubmit(onsubmit)} className='flex flex-col justify-top  items-center w-[100%] '>
 
                     <h1 className='text-4xl mt-8 text-white font-mono'>SignUp</h1>
