@@ -5,8 +5,8 @@ import mongoose from "mongoose"
 export const getTodo = async (req, res) => {
   try {
     
-    const userId  = req.headers["x-user-id"]
-    const objectId = new mongoose.Types.ObjectId(userId)
+    const {id} = req.params
+    const objectId = new mongoose.Types.ObjectId(id)
     console.log(userId);
 
     const todo = await Todo.find({userId:objectId})

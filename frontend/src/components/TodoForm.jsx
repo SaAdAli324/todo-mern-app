@@ -15,13 +15,9 @@ const TodoForm = () => {
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const userId= localStorage.getItem("user")
-                const res = await fetch("http://localhost:3001/api/todos",{
+                const id= localStorage.getItem("user")
+                const res = await fetch(`/api/todos/get/${id}`,{
                     method:"GET",
-                    headers:{"Content-Type":"application/json",
-                          "x-user-id": userId // 
-                    },
-
                 })
                 const data = await res.json()
                 setTodos(data.todo)
@@ -44,7 +40,7 @@ const TodoForm = () => {
                 return navigate("/login")
              }
               console.log(user);
-            const res = await fetch('http://localhost:3001/api/todos', {
+            const res = await fetch('/api/todos', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: data.todo ,userId:user })
@@ -69,7 +65,7 @@ const TodoForm = () => {
     }
     const toogleCheck = async (id) => {
         try {
-            const res = await fetch(`http://localhost:3001/api/todos/${id}/toggle`, {
+            const res = await fetch(`/api/todos/${id}/toggle`, {
                 method: "PATCH"
             })
 
@@ -82,7 +78,7 @@ const TodoForm = () => {
     const del = async (id) => {
         try {
             // const updatedTodos = todos.filter((_, i) => i !== index)
-            const res = await fetch(`http://localhost:3001/api/todos/${id}`, {
+            const res = await fetch(`/api/todos/${id}`, {
                 method: "DELETE",
             })
             const data = await res.json()
@@ -95,7 +91,7 @@ const TodoForm = () => {
 
     const edit = async (id) => {
         try {
-            const res = await fetch(`http://localhost:3001/api/todos/${id}`, {
+            const res = await fetch(`/api/todos/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: editingText ? editingText : text })

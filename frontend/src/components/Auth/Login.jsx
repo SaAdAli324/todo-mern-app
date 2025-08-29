@@ -8,7 +8,7 @@ const Login = () => {
     const navigate = useNavigate()
     const onSubmit = async (data) => { 
         try{
-            const res = await fetch("http://localhost:3001/api/auth/logIn",{
+            const res = await fetch("/api/auth/logIn",{
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({email:data.email , password:data.password , userId:data.userId})
