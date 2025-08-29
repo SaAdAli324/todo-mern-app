@@ -35,11 +35,11 @@ app.use('/api/auth', signUpRouter)
 app.use('/api/auth', logInRouter)
 
 // ---------- FRONTEND ----------
-app.use(express.static(path.join(__dirname, '../frontend/dist')))
+app.use(express.static(path.join(__dirname, 'dist')))
 
 // ✅ Express 5+ catch-all for SPA routes
 app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'))
+  res.sendFile(path.join(__dirname, 'dist/index.html'))
 })
 
 // ---------- START SERVER ----------
