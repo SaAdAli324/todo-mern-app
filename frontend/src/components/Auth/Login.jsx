@@ -15,12 +15,12 @@ const Login = () => {
             })
             const user =await res.json()
        
-            
+            if(user.token){
             localStorage.setItem("token", user.token)
             localStorage.setItem("userName", user.userName)
-            
+            }
 
-            if (user.success ) {
+            if (user.success) {
                 setBackEndError(user)                
                 navigate("/")
 
