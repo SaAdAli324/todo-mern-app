@@ -21,9 +21,11 @@ const Signup = () => {
                 body:JSON.stringify({name:data.name , email:data.email , password:data.password , confirmPassword:data.confirmPassword})
             })
             const user = await res.json()
+            if(user.token){
             localStorage.setItem("token", user.token)
             localStorage.setItem("userName", user.userName)
-             if (user.success) {
+            }
+            if (user.success) {
                 setBackendError(user)
                 
                 setInterval(() => {
