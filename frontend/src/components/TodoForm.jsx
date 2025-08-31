@@ -11,62 +11,79 @@ const TodoForm = () => {
     const [editingId, setEditingId] = useState(null)
     const [editingText, setEditingText] = useState("")
     const navigate = useNavigate()
+    const getToken = () => localStorage.getItem("token")
+    const [refresh , setRefresh] = useState(false)
 
-    useEffect(() => {
-        const fetchTodos = async () => {
-            try {
-                const id= localStorage.getItem("user")
-                const res = await fetch(`/api/todos/get/${id}`,{
-                    method:"GET",
-                })
-                const data = await res.json()
-                setTodos(data.todo)
-                console.log(data.todo);
-                
-
-
-            } catch (err) {
-                console.error("error while fetching todos ", err);
-
-            }
-        }
-        fetchTodos()
-    },[])
-
-    const onSubmit = async (data) => {
+    const fetchTodos = async () => {
         try {
-             const user = localStorage.getItem("user")
-             if (!user) {
-                return navigate("/login")
-             }
-              console.log(user);
-            const res = await fetch('/api/todos', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: data.todo ,userId:user })
+            const id = localStorage.getItem("user")
+            const res = await fetch(`/api/todos`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getToken()}`
+                },
             })
+            const data = await res.json()
+            setTodos(data.todo)
 
-
-            const newTodo = await res.json()
-           
-           
-            
-            
-            setTodos([...todos, { text: newTodo.todo.text, completed: false  }])
-            console.log();
-            
-
-            reset()
         } catch (err) {
-            console.error(err);
+            console.error("error while fetching todos ", err);
 
         }
 
     }
+
+    useEffect(() => {
+
+        fetchTodos()
+
+    },[])
+
+const onSubmit = async (data) => {
+    try {
+        const user = localStorage.getItem("token")
+        if (!user) {
+            return navigate("/login")
+        }
+        
+        const res = await fetch('/api/todos', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ text: data.todo })
+        })
+
+        if (!res.ok) {
+            throw new Error('Failed to add todo')
+        }
+
+        const newTodo = await res.json()
+        
+        // Safely update the UI immediately with the new todo
+        setTodos(prevTodos => {
+            // Ensure prevTodos is always an array
+            const safePrevTodos = Array.isArray(prevTodos) ? prevTodos : [];
+            return [...safePrevTodos, newTodo];
+        });
+        
+        reset()
+        
+        // Then refresh the list from the server to ensure consistency
+        await fetchTodos()
+
+    } catch (err) {
+        console.error(err);
+    }
+}
     const toogleCheck = async (id) => {
         try {
             const res = await fetch(`/api/todos/${id}/toggle`, {
-                method: "PATCH"
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${getToken()}`
+                }
             })
 
             const updatedTodo = await res.json()
@@ -80,9 +97,12 @@ const TodoForm = () => {
             // const updatedTodos = todos.filter((_, i) => i !== index)
             const res = await fetch(`/api/todos/${id}`, {
                 method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${getToken()}`
+                }
             })
             const data = await res.json()
-            setTodos(data.todo)
+            await fetchTodos()
         } catch (err) {
             console.error(err);
 
@@ -93,7 +113,10 @@ const TodoForm = () => {
         try {
             const res = await fetch(`/api/todos/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getToken()}`
+                },
                 body: JSON.stringify({ text: editingText ? editingText : text })
             })
             const data = await res.json()
@@ -102,7 +125,7 @@ const TodoForm = () => {
             setTodos(todos)
             setEditingId(null)
             setEditingText("")
-
+            await fetchTodos()
 
         } catch (err) {
 
@@ -110,7 +133,7 @@ const TodoForm = () => {
     }
 
     return (
-        <div className='flex max-sm:w-80 max-sm:h-130  md: w-162 h-190  rounded-2xl  flex-col gap-8 bg-indigo-600 mt-20 ' >
+        <div className='flex max-sm:w-80 max-sm:h-130   w-162 h-190  rounded-2xl  flex-col gap-8 bg-indigo-600 mt-5 ' >
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-top  items-center w-[100%] '>
 
                 <h1 className='text-4xl mt-8 text-white font-mono'>Todo List</h1>
@@ -129,8 +152,7 @@ const TodoForm = () => {
             </form>
             <hr className='w-[40%] flex m-auto border-1 border-gray-400' />
             <div className=' w-[100%] h-[63%] overflow-auto '>
-                {!todos ? (<p className='text-white flex justify-center underline'>No todo to show!</p>) :
-                    (<ul className='ml-5 flex flex-col gap-3'>
+                {todos ?  (<ul className='ml-5 flex flex-col gap-3'>
                         {todos.map((todo) => {
                             return (
 
@@ -167,7 +189,8 @@ const TodoForm = () => {
                         }
 
                     </ul>
-                    )}
+                    ) :(<p className='text-white flex justify-center underline'>No todo to show!</p>)
+                }
             </div>
         </div>
     )

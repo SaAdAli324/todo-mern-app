@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/signUpModel.js";
 import bcrypt from "bcrypt"
-
+import {genrateToken} from '../utils/token.js'
 export const signUP = async (req ,res) => {
     try{
         const {name , email , password , confirmPassword} = req.body
@@ -19,10 +19,8 @@ export const signUP = async (req ,res) => {
         const hashedPassword  = await bcrypt.hash(password , 10)
         const newUser = new User({name , email , confirmPassword:hashedPassword})
         await newUser.save()
-
-        console.log(newUser._id);
-        
-        res.status(200).json({message:"sign up successfull",user:newUser , success:true , userId:newUser._id})
+        const token = genrateToken(newUser)
+        res.status(200).json({message:"sign up successfull",success:true , token:token ,userName:newUser.name})
     }catch(err){
         console.error("error while signUp in the backend",err);
         res.status(500).json({message:"Can't signup!"})

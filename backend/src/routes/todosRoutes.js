@@ -1,8 +1,10 @@
 import express from "express"
 import { getTodo , postTodo , deleteTodo , updateTodo , patchToggle} from "../controllers/requestContoller.js"
-const router = express.Router()
+import { authMiddleWare } from "../middleware/authMiddleWare.js"
 
-router.get("/get/:id",getTodo)
+const router = express.Router()
+router.use(authMiddleWare)
+router.get("/",getTodo)
 router.post("/", postTodo)
 router.put("/:id",updateTodo)
 router.delete("/:id",deleteTodo)

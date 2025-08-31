@@ -8,24 +8,22 @@ const Login = () => {
     const navigate = useNavigate()
     const onSubmit = async (data) => { 
         try{
-            const res = await fetch("/api/auth/logIn",{
+            const res = await fetch("/api/auth/log/login",{
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
-                body:JSON.stringify({email:data.email , password:data.password , userId:data.userId})
+                body:JSON.stringify({email:data.email , password:data.password})
             })
             const user =await res.json()
        
             
-           const userId = localStorage.setItem("user", user.userId)
+            localStorage.setItem("token", user.token)
+            localStorage.setItem("userName", user.userName)
             
 
-            if (user.success &&  localStorage.getItem("user")) {
-                setBackEndError(user)
-                setInterval(() => {
-                
+            if (user.success ) {
+                setBackEndError(user)                
                 navigate("/")
-                    
-                }, 2000);
+
                
 
             }else{
@@ -35,7 +33,7 @@ const Login = () => {
             
             
         }catch(err){
-            console.error("error while sending user signup req", err);
+            console.error("error while sending user login req", err);
 
         }
     }

@@ -15,14 +15,15 @@ const Signup = () => {
 
     const onsubmit=async (data)=>{
         try{
-            const res = await fetch("/api/auth/signUp",{
+            const res = await fetch("/api/auth/sign/signup",{
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({name:data.name , email:data.email , password:data.password , confirmPassword:data.confirmPassword})
             })
             const user = await res.json()
+            localStorage.setItem("token", user.token)
+            localStorage.setItem("userName", user.userName)
              if (user.success) {
-             localStorage.setItem("user" , user.userId)
                 setBackendError(user)
                 
                 setInterval(() => {

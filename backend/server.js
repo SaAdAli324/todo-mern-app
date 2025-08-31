@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001
 
 
 app.use(cors({
-  origin: 'https://todo-mern-app-51pg.onrender.com',
+  origin: 'http://localhost:5173',
   credentials: true,
 }));
 
@@ -31,14 +31,14 @@ connectDB()
 
 // ---------- API ROUTES ----------
 app.use('/api/todos', todoRouter)
-app.use('/api/auth', signUpRouter)
-app.use('/api/auth', logInRouter)
+app.use('/api/auth/sign', signUpRouter)
+app.use('/api/auth/log', logInRouter)
 
-// ---------- FRONTEND ----------
-app.use(express.static(path.join(__dirname, 'dist')))
 
-// ✅ Express 5+ catch-all for SPA routes
-app.get('/{*path}', (req, res) => {
+app.use(express.static(path.join(__dirname,'dist')))
+
+
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/index.html'))
 })
 

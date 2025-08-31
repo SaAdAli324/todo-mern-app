@@ -5,21 +5,11 @@ import mongoose from "mongoose"
 export const getTodo = async (req, res) => {
   try {
     
-    const {id} = req.params
-    const objectId = new mongoose.Types.ObjectId(id)
-    console.log(userId);
-
-    const todo = await Todo.find({userId:objectId})
-
-    console.log(todo);
-    
+    const todo = await Todo.find({userId:req.user.id})
     if (!todo || todo.length === 0) {
       return res.json({ message:userId })
     }
-
-    if (todo) {
     res.json({ todo:todo })  
-    }
 
     
     
@@ -33,10 +23,10 @@ export const getTodo = async (req, res) => {
 export const postTodo = async (req, res) => {
   try {
 
-    const { text, completed, userId } = req.body
-    const newTodo = new Todo({ text, completed: false, userId })
+    const { text, completed } = req.body
+    const newTodo = new Todo({ text, completed: false, userId:req.user.id })
     await newTodo.save()
-    res.status(201).json({ message: "todos saved!", todo: newTodo })
+    res.status(201).json({ message: "todos saved!", todo: newTodo , success:true })
   } catch (err) {
     console.error("failed to save todos!", err);
   }
@@ -45,12 +35,11 @@ export const postTodo = async (req, res) => {
 export const deleteTodo = async (req, res) => {
   try {
     const { id } = req.params
-    const del = await Todo.findByIdAndDelete(id)
+    const del = await Todo.findByIdAndDelete({_id:id , userId:req.user.id})
     if (!del) {
       res.status(404).json({ message: "todo was'nt found" })
     }
-    const newtodo = await Todo.find()
-    res.status(201).json({ message: 'todo deleted succesfully!', todo: newtodo })
+    res.status(201).json({ message: 'todo deleted succesfully!'})
 
   }
   catch (err) {
@@ -67,7 +56,7 @@ export const updateTodo = async (req, res) => {
 
     console.log(text);
 
-    const updated = await Todo.findByIdAndUpdate(id, {
+    const updated = await Todo.findByIdAndUpdate({_id:id , userId:req.user.id}, {
       text: text,
       new: true
     })
@@ -90,7 +79,7 @@ export const updateTodo = async (req, res) => {
 export const patchToggle = async (req, res) => {
   try {
     const { id } = req.params
-    const todo = await Todo.findById(id)
+    const todo = await Todo.findOne({_id:id , userId:req.user.id})
 
     if (!todo) {
       return res.status(404).json({ message: "todo not found for toogle!" })
